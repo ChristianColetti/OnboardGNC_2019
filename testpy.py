@@ -61,6 +61,17 @@ def estimator_loop(y,xh,servo):
     mag_bias = [np.average(mag[:, 0]), np.average(mag[:, 1]), np.average(mag[:, 2])]
     print('bias calibration complete')
 
+    # ==========================================================================
+    # Logging Initialization
+    # POC: Charlie
+    now = datetime.now()
+    date_time = now.strftime('%y_%m_%d__%H_%M_%S')
+    os.chdir('/home/pi/')
+    f_logfile = open('log_' + date_time + '.csv', 'w+')
+    est_log_string = 'p_n, p_e, -h_b, Vt, alpha, beta, phi_a, theta_a, psi_m, p, q, r, rcin_0, rcin_1, rcin_2, rcin_3, rcin_4, rcin_5, rcin_6, servo_0, servo_1, servo_2, servo_3, servo_4, servo_5, ax, ay, az, gyro_q, gyro_p, gyro_r, mag_x, mag_y, mag_z, pres_baro, gps_posn_n, gps_posn_e, gps_posn_d, gps_vel_n, gps_vel_e, gps_vel_d\n'
+    f_logfile.write(est_log_string)
+    # ==========================================================================
+
     # Define Q here
     Q = np.eye(12)
                                                                                     #cov psi_mag                                                     #cov baro, GPS cov: n,           e,            d,         vn,        ve           vd
@@ -136,11 +147,16 @@ def estimator_loop(y,xh,servo):
 
         alpha = atan(xh[5]/xh[3]) #w/u
         beta = asin(xh[4]/xh[3]) #v/u only good for mostly u flight
+                # DONE: Log X Hat, Servos, RCs, Y to CSV
+        f_logfile.write(
+            ', '.join(map(str, xh)) + ', ' + ', '.join(map(str, servo)) + ', ' + ', '.join(map(str, y)) + '\n')
 
         count=count+1
+
 	if (count % 8000)==0:
 	    print("Phi=%3.0f, Theta=%3.0f, Psi=%3.0f" %  (xh_old[phi]*180/np.pi, xh_old[theta]*180/np.pi, psi_m*180/np.pi))
 	#======ESTIMATOR CODE STOPS HERE===================================
+
 	#if (0.0125- (time.time()-initialEstTime) < 0): print( 1/(time.time()-initialEstTime) )
         time.sleep(max(0.0125-(time.time()-initialEstTime),0) )
 

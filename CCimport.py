@@ -2,7 +2,8 @@
 
 import numpy as np
 import math
-from scipy import expm
+from matfuncs import expm
+
 
 c = math.cos
 s = math.sin
@@ -22,11 +23,11 @@ def Afunc(state):
                 # pn pe pd   u                   v                                          w                        phi theta psi p q r
     A = np.array([[0, 0, 0, c(theta)*c(psi), s(phi)*s(theta)*c(psi)-c(phi)*s(psi), c(phi)*s(theta)*c(psi)+s(phi)*s(psi), 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, c(theta)*s(psi), s(phi)*s(theta)*s(psi)-c(phi)*c(psi), c(phi)*s(theta)*s(psi)+s(phi)*c(psi), 0, 0, 0, 0, 0, 0],
-                 [0, 0, 0, -s(theta), s(phi)*c(theta), c(phi)*cos(theta), 0, 0, 0, 0, 0, 0],
+                 [0, 0, 0, -s(theta), s(phi)*c(theta), c(phi)*c(theta), 0, 0, 0, 0, 0, 0],
                  [0, 0, 0, Xu, r, -q+Xw, 0, -g, 0, 0, 0, 0],
                  [0, 0, 0, -r, Yv, p, g*c(theta), 0, 0, Yp, 0, u0Yr],
                  [0, 0, 0, Zu+q, -p, Zw, 0, 0, 0, 0, u0, 0],
-                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, s(phi)*math.tn(theta), x(phi)*tn(theta)],
+                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, s(phi)*tn(theta), c(phi)*tn(theta)],
                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, c(phi), -s(phi)],
                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, s(phi)/c(theta), c(phi)/c(theta)],
                  [0, 0, 0, 0, Lv, 0, 0, 0, 0, Lp, G1 * p - G2 * r, Lr],
@@ -82,6 +83,7 @@ def FindG(A, F, B, dt):
     G = np.multiply(np.multiply(G_first, Ainv), B)
     return G
 
+
 # def sigmaFunct(alpha, alpha_0, M):
 #     return (1 + math.e ** (-M * (alpha - alpha_0)) + math.e ** (M * (alpha + alpha_0))) / \
 #            ((1 + math.e ** (-M * (alpha - alpha_0))) * (1 + math.e ** (M * (alpha + alpha_0))))
@@ -130,3 +132,4 @@ def FindG(A, F, B, dt):
 #     #calculate alpha, beta
 #     alpha = math.atan2(w,u)
 #     beta = math.asin(v/((V_T+0.0000001)*math.copysign(1, (u+0.0000001))))
+
